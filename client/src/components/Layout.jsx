@@ -29,6 +29,8 @@ const navItems = [
     { path: '/ai/goal-planning', label: 'Goal Planning', icon: '🗺' },
     { path: '/ai/esg-analysis', label: 'ESG Analysis', icon: '🌱' },
     { path: '/ai/estate-planning', label: 'Estate Planning', icon: '🏠' },
+    { path: '/ai/churn-prediction', label: 'Churn Prediction', icon: '📉' },
+    { path: '/ai/behavioral-coaching', label: 'Behavioral Coach', icon: '🧠' },
   ]},
 ];
 

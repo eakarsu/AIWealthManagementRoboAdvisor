@@ -111,4 +111,13 @@ export const api = {
   aiFeeAnalysis: (body) => request('POST', '/ai/fee-analysis', body),
   aiDocumentAnalysis: (body) => request('POST', '/ai/document-analysis', body),
   aiPerformanceAnalysis: (body) => request('POST', '/ai/performance-analysis', body),
+  // NEW AI Features
+  aiPortfolioRebalancer: (body) => request('POST', '/ai/portfolio-rebalancer', body),
+  aiTaxLossHarvesting: (body) => request('POST', '/ai/tax-loss-harvesting', body),
+  aiRetirementReadiness: (body) => request('POST', '/ai/retirement-readiness', body),
+  aiRiskProfileAssessor: (body) => request('POST', '/ai/risk-profile-assessor', body),
+  aiScenarioSimulator: (body) => request('POST', '/ai/scenario-simulator', body),
+  aiChurnPrediction: (body) => request('POST', '/ai/churn-prediction', body),
+  aiBehavioralCoaching: (body) => request('POST', '/ai/behavioral-coaching', body),
+  aiHistory: (params = '') => request('GET', `/ai/history${params}`),
 };

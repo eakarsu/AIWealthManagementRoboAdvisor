@@ -1,8 +1,17 @@
 require('dotenv').config();
 
+function parseAIJson(text) {
+  try { return JSON.parse(text); } catch (e) {}
+  const stripped = text.replace(/```(?:json)?\n?/g, '').replace(/```/g, '').trim();
+  try { return JSON.parse(stripped); } catch (e) {}
+  const start = text.indexOf('{'); const end = text.lastIndexOf('}');
+  if (start !== -1 && end !== -1) { try { return JSON.parse(text.slice(start, end + 1)); } catch (e) {} }
+  return null;
+}
+
 async function queryOpenRouter(systemPrompt, userPrompt) {
   const apiKey = process.env.OPENROUTER_API_KEY;
-  const model = process.env.OPENROUTER_MODEL || 'anthropic/claude-haiku-4.5';
+  const model = process.env.OPENROUTER_MODEL || 'anthropic/claude-3-5-sonnet-20241022';
 
   if (!apiKey || apiKey === 'your_openrouter_key_here') {
     return {
@@ -18,7 +27,7 @@ async function queryOpenRouter(systemPrompt, userPrompt) {
       headers: {
         'Authorization': `Bearer ${apiKey}`,
         'Content-Type': 'application/json',
-        'HTTP-Referer': 'http://localhost:3000',
+        'HTTP-Referer': 'http://localhost:5173',
         'X-Title': 'AI Wealth Management Robo-Advisor',
       },
       body: JSON.stringify({
@@ -45,4 +54,4 @@ async function queryOpenRouter(systemPrompt, userPrompt) {
   }
 }
 
-module.exports = { queryOpenRouter };
+module.exports = { queryOpenRouter, parseAIJson };
