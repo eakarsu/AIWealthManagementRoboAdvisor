@@ -26,6 +26,11 @@ import AIEstatePlanning from './pages/AIEstatePlanning';
 import AIChurnPrediction from './pages/AIChurnPrediction';
 import AIBehavioralCoaching from './pages/AIBehavioralCoaching';
 
+import CodexCustomVizFeature from './pages/CodexCustomVizFeature';
+import CodexOperationsFeature from './pages/CodexOperationsFeature';
+
+import TimelineView from './pages/TimelineView';
+
 // // === Batch 09 Gaps & Frontend Mounts ===
 const MultiGenerationalWealthPlanningWithTrustStructureOptiCfs = React.lazy(() => import('./pages/Batch09/MultiGenerationalWealthPlanningWithTrustStructureOptiCfs'));
 const BehavioralFinanceCoachingTrackBiasSuggestInterventionsCfs = React.lazy(() => import('./pages/Batch09/BehavioralFinanceCoachingTrackBiasSuggestInterventionsCfs'));
@@ -51,6 +56,10 @@ function ProtectedRoute({ children }) {
 export default function App() {
   return (
     <Routes>
+        <Route path="/insights/timeline" element={<ProtectedRoute><TimelineView /></ProtectedRoute>} />
+        <Route path="/codex/custom-viz" element={<ProtectedRoute><CodexCustomVizFeature /></ProtectedRoute>} />
+        <Route path="/codex/operations" element={<ProtectedRoute><CodexOperationsFeature /></ProtectedRoute>} />
+
       <Route path="/login" element={<Login />} />
       <Route path="/" element={<ProtectedRoute><Layout /></ProtectedRoute>}>
         <Route index element={<Dashboard />} />
