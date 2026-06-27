@@ -17,6 +17,16 @@ async function request(method, path, body) {
   return data;
 }
 
+function crud(path) {
+  return {
+    list: () => request('GET', path),
+    get: (id) => request('GET', `${path}/${id}`),
+    create: (body) => request('POST', path, body),
+    update: (id, body) => request('PUT', `${path}/${id}`, body),
+    remove: (id) => request('DELETE', `${path}/${id}`),
+  };
+}
+
 export const api = {
   // Auth
   login: (body) => request('POST', '/auth/login', body),
@@ -91,6 +101,20 @@ export const api = {
   createPerformance: (body) => request('POST', '/performance', body),
   updatePerformance: (id, body) => request('PUT', `/performance/${id}`, body),
   deletePerformance: (id) => request('DELETE', `/performance/${id}`),
+
+  // Wealth operations feature modules
+  households: crud('/households'),
+  trustBeneficiaries: crud('/trust-beneficiaries'),
+  custodianAccounts: crud('/custodian-accounts'),
+  investmentPolicies: crud('/investment-policies'),
+  meetingNotes: crud('/meeting-notes'),
+  complianceReviews: crud('/compliance-reviews'),
+  taxPackages: crud('/tax-packages'),
+  cashFlowPlans: crud('/cash-flow-plans'),
+  insurancePlans: crud('/insurance-plans'),
+  advisorTasks: crud('/advisor-tasks'),
+  modelPortfolios: crud('/model-portfolios'),
+  clientMessages: crud('/client-messages'),
 
   // AI Features
   aiPortfolioAnalysis: (body) => request('POST', '/ai/portfolio-analysis', body),

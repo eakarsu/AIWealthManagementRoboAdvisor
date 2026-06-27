@@ -1,4 +1,4 @@
-export default function Modal({ isOpen, onClose, title, children, onSubmit, submitLabel }) {
+export default function Modal({ isOpen, onClose, title, children, onSubmit, submitLabel, footer }) {
   if (!isOpen) return null;
   return (
     <div className="modal-overlay" onClick={onClose}>
@@ -8,7 +8,9 @@ export default function Modal({ isOpen, onClose, title, children, onSubmit, subm
           <button className="modal-close" onClick={onClose}>&times;</button>
         </div>
         <div className="modal-body">{children}</div>
-        {onSubmit && (
+        {footer ? (
+          <div className="modal-footer">{footer}</div>
+        ) : onSubmit && (
           <div className="modal-footer">
             <button className="btn btn-secondary" onClick={onClose}>Cancel</button>
             <button className="btn btn-primary" onClick={onSubmit}>{submitLabel || 'Save'}</button>

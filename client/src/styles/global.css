@@ -440,6 +440,23 @@ tr:last-child td {
   font-size: 13px;
 }
 
+.btn-create {
+  min-width: 156px;
+  justify-content: center;
+}
+
+.btn-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.18);
+  font-weight: 700;
+  line-height: 1;
+}
+
 .btn-ai {
   background: linear-gradient(135deg, var(--primary), var(--secondary));
   color: #fff;
@@ -485,13 +502,15 @@ tr:last-child td {
 
 .form-control {
   width: 100%;
-  padding: 10px 14px;
+  min-height: 44px;
+  padding: 11px 14px;
   border: 1px solid var(--border);
   border-radius: var(--radius-sm);
   font-size: 14px;
   font-family: inherit;
   transition: var(--transition);
   background: #fff;
+  color: var(--text);
 }
 
 .form-control:focus {
@@ -510,13 +529,28 @@ select.form-control {
 
 textarea.form-control {
   resize: vertical;
-  min-height: 80px;
+  min-height: 96px;
+  line-height: 1.5;
 }
 
 .form-row {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 16px;
+}
+
+.feature-form {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 18px 20px;
+}
+
+.feature-form .form-group {
+  margin-bottom: 0;
+}
+
+.form-group-wide {
+  grid-column: 1 / -1;
 }
 
 /* Modal */
@@ -526,7 +560,7 @@ textarea.form-control {
   left: 0;
   right: 0;
   bottom: 0;
-  background: rgba(0,0,0,0.5);
+  background: rgba(15, 23, 42, 0.58);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -537,11 +571,12 @@ textarea.form-control {
 .modal {
   background: var(--bg-card);
   border-radius: var(--radius);
-  width: 90%;
-  max-width: 600px;
+  width: min(92vw, 860px);
+  max-width: 860px;
   max-height: 90vh;
-  overflow-y: auto;
+  overflow: hidden;
   box-shadow: var(--shadow-lg);
+  border: 1px solid rgba(148, 163, 184, 0.28);
 }
 
 .modal-header {
@@ -550,6 +585,7 @@ textarea.form-control {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  background: #fff;
 }
 
 .modal-header h2 {
@@ -568,6 +604,9 @@ textarea.form-control {
 
 .modal-body {
   padding: 24px;
+  max-height: min(64vh, 680px);
+  overflow-y: auto;
+  background: #f8fafc;
 }
 
 .modal-footer {
@@ -576,6 +615,18 @@ textarea.form-control {
   display: flex;
   justify-content: flex-end;
   gap: 12px;
+  background: #fff;
+}
+
+@media (max-width: 760px) {
+  .feature-form {
+    grid-template-columns: 1fr;
+  }
+
+  .modal {
+    width: 94vw;
+    max-height: 92vh;
+  }
 }
 
 /* Detail View */

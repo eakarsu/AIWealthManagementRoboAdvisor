@@ -29,6 +29,18 @@ app.use('/api/alerts', require('./routes/alerts'));
 app.use('/api/fees', require('./routes/fees'));
 app.use('/api/documents', require('./routes/documents'));
 app.use('/api/performance', require('./routes/performance'));
+app.use('/api/households', require('./routes/households'));
+app.use('/api/trust-beneficiaries', require('./routes/trustBeneficiaries'));
+app.use('/api/custodian-accounts', require('./routes/custodianAccounts'));
+app.use('/api/investment-policies', require('./routes/investmentPolicies'));
+app.use('/api/meeting-notes', require('./routes/meetingNotes'));
+app.use('/api/compliance-reviews', require('./routes/complianceReviews'));
+app.use('/api/tax-packages', require('./routes/taxPackages'));
+app.use('/api/cash-flow-plans', require('./routes/cashFlowPlans'));
+app.use('/api/insurance-plans', require('./routes/insurancePlans'));
+app.use('/api/advisor-tasks', require('./routes/advisorTasks'));
+app.use('/api/model-portfolios', require('./routes/modelPortfolios'));
+app.use('/api/client-messages', require('./routes/clientMessages'));
 app.use('/api/ai', require('./routes/ai'));
 app.use('/api/integrations', require('./routes/integrations'));
 app.use('/api/custom', require('./routes/customFeatures'));
@@ -43,4 +55,3 @@ app.use('/api/gap-nonai-aiwealthmanagementroboadvisor', require('./routes/batch0
 app.listen(PORT, () => {
   console.log(`Server running on http://localhost:${PORT}`);
 });
-

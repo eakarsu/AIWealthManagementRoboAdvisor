@@ -1,3 +1,4 @@
+import React from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import { useAuth } from './context/AuthContext';
 import Layout from './components/Layout';
@@ -25,6 +26,18 @@ import AIESGAnalysis from './pages/AIESGAnalysis';
 import AIEstatePlanning from './pages/AIEstatePlanning';
 import AIChurnPrediction from './pages/AIChurnPrediction';
 import AIBehavioralCoaching from './pages/AIBehavioralCoaching';
+import Households from './pages/Households';
+import TrustBeneficiaries from './pages/TrustBeneficiaries';
+import CustodianAccounts from './pages/CustodianAccounts';
+import InvestmentPolicies from './pages/InvestmentPolicies';
+import MeetingNotes from './pages/MeetingNotes';
+import ComplianceReviews from './pages/ComplianceReviews';
+import TaxPackages from './pages/TaxPackages';
+import CashFlowPlans from './pages/CashFlowPlans';
+import InsurancePlans from './pages/InsurancePlans';
+import AdvisorTasks from './pages/AdvisorTasks';
+import ModelPortfolios from './pages/ModelPortfolios';
+import ClientMessages from './pages/ClientMessages';
 
 import CodexCustomVizFeature from './pages/CodexCustomVizFeature';
 import CodexOperationsFeature from './pages/CodexOperationsFeature';
@@ -73,6 +86,18 @@ export default function App() {
         <Route path="fees" element={<Fees />} />
         <Route path="documents" element={<Documents />} />
         <Route path="performance" element={<Performance />} />
+        <Route path="households" element={<Households />} />
+        <Route path="trust-beneficiaries" element={<TrustBeneficiaries />} />
+        <Route path="custodian-accounts" element={<CustodianAccounts />} />
+        <Route path="investment-policies" element={<InvestmentPolicies />} />
+        <Route path="meeting-notes" element={<MeetingNotes />} />
+        <Route path="compliance-reviews" element={<ComplianceReviews />} />
+        <Route path="tax-packages" element={<TaxPackages />} />
+        <Route path="cash-flow-plans" element={<CashFlowPlans />} />
+        <Route path="insurance-plans" element={<InsurancePlans />} />
+        <Route path="advisor-tasks" element={<AdvisorTasks />} />
+        <Route path="model-portfolios" element={<ModelPortfolios />} />
+        <Route path="client-messages" element={<ClientMessages />} />
         <Route path="ai/portfolio-analysis" element={<AIPortfolioAnalysis />} />
         <Route path="ai/risk-assessment" element={<AIRiskAssessment />} />
         <Route path="ai/investment-recommendations" element={<AIInvestmentRecs />} />

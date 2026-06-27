@@ -18,6 +18,18 @@ async function seed() {
     // Drop tables if exist
     await client.query(`
       DROP TABLE IF EXISTS performance_records CASCADE;
+      DROP TABLE IF EXISTS client_messages CASCADE;
+      DROP TABLE IF EXISTS model_portfolios CASCADE;
+      DROP TABLE IF EXISTS advisor_tasks CASCADE;
+      DROP TABLE IF EXISTS insurance_plans CASCADE;
+      DROP TABLE IF EXISTS cash_flow_plans CASCADE;
+      DROP TABLE IF EXISTS tax_packages CASCADE;
+      DROP TABLE IF EXISTS compliance_reviews CASCADE;
+      DROP TABLE IF EXISTS meeting_notes CASCADE;
+      DROP TABLE IF EXISTS investment_policies CASCADE;
+      DROP TABLE IF EXISTS custodian_accounts CASCADE;
+      DROP TABLE IF EXISTS trust_beneficiaries CASCADE;
+      DROP TABLE IF EXISTS households CASCADE;
       DROP TABLE IF EXISTS documents CASCADE;
       DROP TABLE IF EXISTS fees CASCADE;
       DROP TABLE IF EXISTS alerts CASCADE;
@@ -172,6 +184,196 @@ async function seed() {
         benchmark_return DECIMAL(8,4),
         sharpe_ratio DECIMAL(8,4),
         volatility DECIMAL(8,4)
+      );
+
+      CREATE TABLE households (
+        id SERIAL PRIMARY KEY,
+        household_name VARCHAR(255) NOT NULL,
+        primary_client_id INTEGER REFERENCES clients(id),
+        relationship_manager VARCHAR(255),
+        total_net_worth DECIMAL(15,2) DEFAULT 0,
+        annual_income DECIMAL(15,2) DEFAULT 0,
+        risk_profile VARCHAR(50) DEFAULT 'moderate',
+        planning_stage VARCHAR(100),
+        status VARCHAR(50) DEFAULT 'active',
+        notes TEXT,
+        created_at TIMESTAMP DEFAULT NOW(),
+        updated_at TIMESTAMP DEFAULT NOW()
+      );
+
+      CREATE TABLE trust_beneficiaries (
+        id SERIAL PRIMARY KEY,
+        client_id INTEGER REFERENCES clients(id),
+        trust_name VARCHAR(255),
+        beneficiary_name VARCHAR(255),
+        relationship VARCHAR(100),
+        beneficiary_type VARCHAR(100),
+        distribution_terms TEXT,
+        current_value DECIMAL(15,2) DEFAULT 0,
+        next_review_date DATE,
+        status VARCHAR(50) DEFAULT 'active',
+        notes TEXT,
+        created_at TIMESTAMP DEFAULT NOW(),
+        updated_at TIMESTAMP DEFAULT NOW()
+      );
+
+      CREATE TABLE custodian_accounts (
+        id SERIAL PRIMARY KEY,
+        client_id INTEGER REFERENCES clients(id),
+        custodian_name VARCHAR(255),
+        account_number VARCHAR(100),
+        account_type VARCHAR(100),
+        sync_status VARCHAR(50) DEFAULT 'connected',
+        last_sync_at TIMESTAMP,
+        market_value DECIMAL(15,2) DEFAULT 0,
+        cash_value DECIMAL(15,2) DEFAULT 0,
+        external_owner VARCHAR(255),
+        notes TEXT,
+        created_at TIMESTAMP DEFAULT NOW(),
+        updated_at TIMESTAMP DEFAULT NOW()
+      );
+
+      CREATE TABLE investment_policies (
+        id SERIAL PRIMARY KEY,
+        client_id INTEGER REFERENCES clients(id),
+        portfolio_id INTEGER REFERENCES portfolios(id),
+        policy_name VARCHAR(255),
+        objective TEXT,
+        target_allocation TEXT,
+        constraints TEXT,
+        review_frequency VARCHAR(100),
+        next_review_date DATE,
+        status VARCHAR(50) DEFAULT 'draft',
+        notes TEXT,
+        created_at TIMESTAMP DEFAULT NOW(),
+        updated_at TIMESTAMP DEFAULT NOW()
+      );
+
+      CREATE TABLE meeting_notes (
+        id SERIAL PRIMARY KEY,
+        client_id INTEGER REFERENCES clients(id),
+        meeting_date DATE,
+        meeting_type VARCHAR(100),
+        advisor VARCHAR(255),
+        summary TEXT,
+        follow_up_items TEXT,
+        next_meeting_date DATE,
+        sentiment VARCHAR(50),
+        status VARCHAR(50) DEFAULT 'open',
+        notes TEXT,
+        created_at TIMESTAMP DEFAULT NOW(),
+        updated_at TIMESTAMP DEFAULT NOW()
+      );
+
+      CREATE TABLE compliance_reviews (
+        id SERIAL PRIMARY KEY,
+        client_id INTEGER REFERENCES clients(id),
+        review_type VARCHAR(120),
+        regulation VARCHAR(120),
+        reviewer VARCHAR(255),
+        due_date DATE,
+        completed_date DATE,
+        risk_level VARCHAR(50),
+        status VARCHAR(50) DEFAULT 'pending',
+        findings TEXT,
+        remediation_plan TEXT,
+        created_at TIMESTAMP DEFAULT NOW(),
+        updated_at TIMESTAMP DEFAULT NOW()
+      );
+
+      CREATE TABLE tax_packages (
+        id SERIAL PRIMARY KEY,
+        client_id INTEGER REFERENCES clients(id),
+        tax_year INTEGER,
+        package_type VARCHAR(120),
+        forms_included TEXT,
+        delivery_method VARCHAR(100),
+        prepared_by VARCHAR(255),
+        review_status VARCHAR(80),
+        delivered_at TIMESTAMP,
+        status VARCHAR(50) DEFAULT 'draft',
+        notes TEXT,
+        created_at TIMESTAMP DEFAULT NOW(),
+        updated_at TIMESTAMP DEFAULT NOW()
+      );
+
+      CREATE TABLE cash_flow_plans (
+        id SERIAL PRIMARY KEY,
+        client_id INTEGER REFERENCES clients(id),
+        plan_name VARCHAR(255),
+        monthly_income DECIMAL(15,2) DEFAULT 0,
+        monthly_expenses DECIMAL(15,2) DEFAULT 0,
+        withdrawal_rate DECIMAL(6,3) DEFAULT 0,
+        liquidity_months DECIMAL(8,2) DEFAULT 0,
+        strategy TEXT,
+        next_review_date DATE,
+        status VARCHAR(50) DEFAULT 'active',
+        notes TEXT,
+        created_at TIMESTAMP DEFAULT NOW(),
+        updated_at TIMESTAMP DEFAULT NOW()
+      );
+
+      CREATE TABLE insurance_plans (
+        id SERIAL PRIMARY KEY,
+        client_id INTEGER REFERENCES clients(id),
+        policy_type VARCHAR(120),
+        carrier VARCHAR(255),
+        coverage_amount DECIMAL(15,2) DEFAULT 0,
+        premium_amount DECIMAL(15,2) DEFAULT 0,
+        beneficiary VARCHAR(255),
+        renewal_date DATE,
+        gap_assessment TEXT,
+        status VARCHAR(50) DEFAULT 'active',
+        notes TEXT,
+        created_at TIMESTAMP DEFAULT NOW(),
+        updated_at TIMESTAMP DEFAULT NOW()
+      );
+
+      CREATE TABLE advisor_tasks (
+        id SERIAL PRIMARY KEY,
+        client_id INTEGER REFERENCES clients(id),
+        assigned_to VARCHAR(255),
+        task_type VARCHAR(120),
+        title VARCHAR(255),
+        priority VARCHAR(50),
+        due_date DATE,
+        completed_at TIMESTAMP,
+        status VARCHAR(50) DEFAULT 'open',
+        description TEXT,
+        notes TEXT,
+        created_at TIMESTAMP DEFAULT NOW(),
+        updated_at TIMESTAMP DEFAULT NOW()
+      );
+
+      CREATE TABLE model_portfolios (
+        id SERIAL PRIMARY KEY,
+        model_name VARCHAR(255),
+        risk_level VARCHAR(50),
+        objective TEXT,
+        target_allocation TEXT,
+        minimum_account_size DECIMAL(15,2) DEFAULT 0,
+        rebalance_frequency VARCHAR(100),
+        benchmark VARCHAR(120),
+        status VARCHAR(50) DEFAULT 'active',
+        notes TEXT,
+        created_at TIMESTAMP DEFAULT NOW(),
+        updated_at TIMESTAMP DEFAULT NOW()
+      );
+
+      CREATE TABLE client_messages (
+        id SERIAL PRIMARY KEY,
+        client_id INTEGER REFERENCES clients(id),
+        sender VARCHAR(255),
+        recipient VARCHAR(255),
+        subject VARCHAR(255),
+        message_body TEXT,
+        channel VARCHAR(100),
+        priority VARCHAR(50),
+        read_status VARCHAR(50) DEFAULT 'unread',
+        sent_at TIMESTAMP,
+        status VARCHAR(50) DEFAULT 'sent',
+        created_at TIMESTAMP DEFAULT NOW(),
+        updated_at TIMESTAMP DEFAULT NOW()
       );
     `);
 
@@ -430,6 +632,248 @@ async function seed() {
       (11, '2024-03-31', 900000, 0.0080, 0.1050, 0.0780, 1.32, 0.0940),
       (12, '2024-03-31', 800000, 0.0065, 0.0820, 0.0780, 1.15, 0.0850);
     `);
+
+    // Seed feature expansion modules (15 each)
+    const clientNames = [
+      'James Wilson', 'Emily Thompson', 'Robert Martinez', 'Lisa Anderson', 'David Kim',
+      'Jennifer Brown', 'William Taylor', 'Amanda Davis', 'Christopher Lee', 'Jessica White',
+      'Daniel Garcia', 'Michelle Robinson', 'Thomas Clark', 'Sarah Mitchell', 'Kevin Wright'
+    ];
+    const advisors = ['Sarah Johnson', 'Michael Chen', 'Admin User'];
+    const custodians = ['Schwab', 'Fidelity', 'Pershing', 'TD Ameritrade', 'Interactive Brokers'];
+
+    for (let i = 0; i < 15; i++) {
+      const clientId = i + 1;
+      const portfolioId = (i % 16) + 1;
+      const advisor = advisors[i % advisors.length];
+      const dueDay = String(5 + (i % 20)).padStart(2, '0');
+      const month = String(1 + (i % 9)).padStart(2, '0');
+      const clientName = clientNames[i];
+
+      await client.query(
+        `INSERT INTO households
+          (household_name, primary_client_id, relationship_manager, total_net_worth, annual_income, risk_profile, planning_stage, status, notes)
+         VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9)`,
+        [
+          `${clientName} Household`,
+          clientId,
+          advisor,
+          650000 + i * 475000,
+          90000 + i * 42000,
+          ['conservative','moderate','aggressive'][i % 3],
+          ['onboarding','planning','implementation','annual_review','next_gen_transfer'][i % 5],
+          i === 14 ? 'review' : 'active',
+          `Household record links family goals, relationship map, and planning scope for ${clientName}.`
+        ]
+      );
+
+      await client.query(
+        `INSERT INTO trust_beneficiaries
+          (client_id, trust_name, beneficiary_name, relationship, beneficiary_type, distribution_terms, current_value, next_review_date, status, notes)
+         VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10)`,
+        [
+          clientId,
+          `${clientName} Family Trust`,
+          [`${clientName} Jr.`, `${clientName} Spouse`, `${clientName} Foundation`][i % 3],
+          ['child','spouse','charity','grandchild','sibling'][i % 5],
+          ['primary','contingent','charitable','trustee'][i % 4],
+          ['HEMS standard', 'Age 30/35 staged distribution', 'Annual discretionary distribution', 'Education and medical only'][i % 4],
+          250000 + i * 95000,
+          `2026-${month}-${dueDay}`,
+          ['active','needs_review','draft','inactive'][i % 4],
+          `Beneficiary workflow tracks trust terms, review dates, and estate planning updates.`
+        ]
+      );
+
+      await client.query(
+        `INSERT INTO custodian_accounts
+          (client_id, custodian_name, account_number, account_type, sync_status, last_sync_at, market_value, cash_value, external_owner, notes)
+         VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10)`,
+        [
+          clientId,
+          custodians[i % custodians.length],
+          `EXT-${String(100000 + i * 137).padStart(6, '0')}`,
+          ['taxable','ira','roth_ira','trust','joint','401k'][i % 6],
+          ['connected','needs_reauth','syncing','error'][i % 4],
+          `2026-${month}-${dueDay} 09:00:00`,
+          300000 + i * 225000,
+          15000 + i * 5250,
+          clientName,
+          `External account aggregation record for holdings, balances, and sync status.`
+        ]
+      );
+
+      await client.query(
+        `INSERT INTO investment_policies
+          (client_id, portfolio_id, policy_name, objective, target_allocation, constraints, review_frequency, next_review_date, status, notes)
+         VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10)`,
+        [
+          clientId,
+          portfolioId,
+          `${clientName} IPS ${2025 + (i % 2)}`,
+          ['Capital preservation with income', 'Balanced growth and downside control', 'Long-term growth with tax efficiency', 'Multi-generational wealth transfer'][i % 4],
+          ['60% equity / 35% fixed income / 5% cash', '75% equity / 15% fixed income / 10% alternatives', '40% equity / 50% fixed income / 10% cash'][i % 3],
+          ['No private funds', 'ESG preference', 'Municipal bond preference', 'Single-stock concentration cap 15%'][i % 4],
+          ['quarterly','semiannual','annual'][i % 3],
+          `2026-${month}-${dueDay}`,
+          ['draft','approved','review_due','archived'][i % 4],
+          `IPS governs suitability, allocation bands, liquidity needs, and restrictions.`
+        ]
+      );
+
+      await client.query(
+        `INSERT INTO meeting_notes
+          (client_id, meeting_date, meeting_type, advisor, summary, follow_up_items, next_meeting_date, sentiment, status, notes)
+         VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10)`,
+        [
+          clientId,
+          `2026-${month}-${dueDay}`,
+          ['annual_review','portfolio_review','tax_planning','estate_review','prospect_call'][i % 5],
+          advisor,
+          `Reviewed portfolio positioning, liquidity needs, tax planning items, and family priorities for ${clientName}.`,
+          ['Send IPS update', 'Coordinate CPA package', 'Schedule estate attorney review', 'Prepare proposal deck'][i % 4],
+          `2026-${String(2 + (i % 9)).padStart(2, '0')}-${dueDay}`,
+          ['positive','neutral','concerned','highly_engaged'][i % 4],
+          ['open','completed','waiting_on_client','advisor_follow_up'][i % 4],
+          `CRM note preserves client context and next steps.`
+        ]
+      );
+
+      await client.query(
+        `INSERT INTO compliance_reviews
+          (client_id, review_type, regulation, reviewer, due_date, completed_date, risk_level, status, findings, remediation_plan)
+         VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10)`,
+        [
+          clientId,
+          ['Reg BI review','ADV delivery','Suitability review','KYC refresh','Marketing review'][i % 5],
+          ['Reg BI','Form ADV','FINRA 2111','KYC/AML','SEC Marketing Rule'][i % 5],
+          advisor,
+          `2026-${month}-${dueDay}`,
+          i % 4 === 0 ? `2026-${month}-${String(Number(dueDay) + 2).padStart(2, '0')}` : null,
+          ['low','medium','high','critical'][i % 4],
+          ['pending','in_review','approved','remediation_required'][i % 4],
+          `Review checks disclosure delivery, recommendation rationale, documentation completeness, and suitability evidence.`,
+          `Collect missing evidence and document advisor rationale where needed.`
+        ]
+      );
+
+      await client.query(
+        `INSERT INTO tax_packages
+          (client_id, tax_year, package_type, forms_included, delivery_method, prepared_by, review_status, delivered_at, status, notes)
+         VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10)`,
+        [
+          clientId,
+          2025,
+          ['annual_tax_packet','1099_package','k1_package','realized_gain_loss','cpa_package'][i % 5],
+          ['1099-B, 1099-DIV, realized gain/loss report', 'K-1 package and capital account summary', 'Tax summary, charitable gifts, estimated tax worksheet'][i % 3],
+          ['client_portal','secure_email','cpa_delivery'][i % 3],
+          advisor,
+          ['not_started','prepared','in_review','approved','correction_needed'][i % 5],
+          i % 3 === 0 ? `2026-02-${dueDay} 14:00:00` : null,
+          ['draft','ready','delivered','corrected'][i % 4],
+          `Annual tax document package tracks form inventory, CPA delivery, review status, and corrections.`
+        ]
+      );
+
+      await client.query(
+        `INSERT INTO cash_flow_plans
+          (client_id, plan_name, monthly_income, monthly_expenses, withdrawal_rate, liquidity_months, strategy, next_review_date, status, notes)
+         VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10)`,
+        [
+          clientId,
+          `${clientName} Cash Flow Plan`,
+          8500 + i * 1250,
+          5200 + i * 900,
+          2.5 + (i % 5) * 0.35,
+          6 + (i % 18),
+          ['Bucket strategy with cash reserve', 'Systematic monthly withdrawal', 'Dividend income priority', 'Tax-sensitive liquidation order'][i % 4],
+          `2026-${month}-${dueDay}`,
+          ['active','review_due','draft','paused'][i % 4],
+          `Cash-flow workflow models income, expenses, withdrawal strategy, and liquidity runway.`
+        ]
+      );
+
+      await client.query(
+        `INSERT INTO insurance_plans
+          (client_id, policy_type, carrier, coverage_amount, premium_amount, beneficiary, renewal_date, gap_assessment, status, notes)
+         VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10)`,
+        [
+          clientId,
+          ['term_life','whole_life','disability','umbrella','long_term_care'][i % 5],
+          ['Northwestern Mutual','MassMutual','Guardian','Chubb','New York Life'][i % 5],
+          500000 + i * 175000,
+          1200 + i * 375,
+          [`${clientName} Spouse`, `${clientName} Trust`, `${clientName} Children`][i % 3],
+          `2026-${month}-${dueDay}`,
+          ['Adequate coverage', 'Coverage gap for income replacement', 'Beneficiary update recommended', 'Premium review due'][i % 4],
+          ['active','review_due','lapsed','proposed'][i % 4],
+          `Insurance planning record tracks protection needs and policy renewal workflow.`
+        ]
+      );
+
+      await client.query(
+        `INSERT INTO advisor_tasks
+          (client_id, assigned_to, task_type, title, priority, due_date, completed_at, status, description, notes)
+         VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10)`,
+        [
+          clientId,
+          advisor,
+          ['review','compliance','client_follow_up','proposal','operations'][i % 5],
+          ['Prepare annual review', 'Update IPS', 'Send tax package', 'Confirm beneficiary details', 'Rebalance proposal'][i % 5],
+          ['low','medium','high','urgent'][i % 4],
+          `2026-${month}-${dueDay}`,
+          i % 5 === 0 ? `2026-${month}-${String(Number(dueDay) + 1).padStart(2, '0')} 10:30:00` : null,
+          ['open','in_progress','completed','blocked'][i % 4],
+          `Advisor workflow task for client service and compliance follow-through.`,
+          `Task tied to ${clientName}.`
+        ]
+      );
+
+      await client.query(
+        `INSERT INTO client_messages
+          (client_id, sender, recipient, subject, message_body, channel, priority, read_status, sent_at, status)
+         VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10)`,
+        [
+          clientId,
+          advisor,
+          clientName,
+          ['Quarterly review follow-up', 'Tax package ready', 'Portfolio update', 'Action items from meeting', 'Secure document request'][i % 5],
+          `Secure portal message for ${clientName} with next steps and requested confirmations.`,
+          ['portal','secure_email','sms_notice'][i % 3],
+          ['low','normal','high','urgent'][i % 4],
+          ['unread','read','responded'][i % 3],
+          `2026-${month}-${dueDay} 13:00:00`,
+          ['sent','archived','draft'][i % 3]
+        ]
+      );
+    }
+
+    const modelData = [
+      ['Conservative Income', 'low', 'Income and capital preservation', '25% equity / 65% fixed income / 10% cash', 100000, 'quarterly', 'Bloomberg US Aggregate', 'active'],
+      ['Balanced Core', 'moderate', 'Balanced growth and income', '60% equity / 35% fixed income / 5% cash', 250000, 'quarterly', '60/40 Blend', 'active'],
+      ['Growth Plus', 'high', 'Long-term capital appreciation', '85% equity / 10% fixed income / 5% alternatives', 500000, 'monthly', 'MSCI ACWI', 'active'],
+      ['Tax Efficient Municipal', 'low-moderate', 'Tax-aware income', '35% equity / 55% municipal bonds / 10% cash', 250000, 'quarterly', 'Muni Bond Blend', 'active'],
+      ['ESG Balanced', 'moderate', 'Sustainable balanced allocation', '65% ESG equity / 25% green bonds / 10% alternatives', 250000, 'quarterly', 'MSCI ESG Leaders', 'active'],
+      ['Retirement Income', 'low', 'Distribution stability', '30% equity / 55% fixed income / 15% cash', 100000, 'semiannual', 'Retirement Income Blend', 'active'],
+      ['Ultra High Net Worth Alternatives', 'high', 'Diversified alternatives and growth', '45% equity / 25% alternatives / 20% fixed income / 10% cash', 2000000, 'quarterly', 'Custom UHNW Blend', 'active'],
+      ['Young Accumulator', 'high', 'Aggressive accumulation', '95% equity / 5% cash', 50000, 'quarterly', 'Russell 3000', 'active'],
+      ['Foundation Balanced', 'moderate', 'Spending policy support', '55% equity / 35% fixed income / 10% alternatives', 1000000, 'quarterly', 'Foundation Policy Blend', 'active'],
+      ['Capital Preservation', 'low', 'Principal protection and liquidity', '10% equity / 70% short fixed income / 20% cash', 50000, 'monthly', 'T-Bill Blend', 'active'],
+      ['Global Growth', 'high', 'Global equity exposure', '70% US equity / 25% international equity / 5% cash', 250000, 'quarterly', 'MSCI ACWI', 'active'],
+      ['Inflation Hedge', 'moderate-high', 'Real asset protection', '35% equity / 25% TIPS / 25% real assets / 15% commodities', 500000, 'quarterly', 'CPI+ Blend', 'active'],
+      ['Options Income', 'moderate', 'Covered-call income strategy', '70% dividend equity / 20% fixed income / 10% cash', 500000, 'monthly', 'CBOE BXM', 'active'],
+      ['Cash Reserve Ladder', 'low', 'Liquidity and short-term yield', '80% T-bills / 20% high-yield savings', 25000, 'monthly', '3M T-Bill', 'active'],
+      ['Legacy Transfer', 'moderate', 'Multi-generational wealth transfer', '50% equity / 30% fixed income / 20% alternatives', 1000000, 'semiannual', 'Legacy Blend', 'active'],
+    ];
+
+    for (const [modelName, riskLevel, objective, allocation, minimum, rebalance, benchmark, status] of modelData) {
+      await client.query(
+        `INSERT INTO model_portfolios
+          (model_name, risk_level, objective, target_allocation, minimum_account_size, rebalance_frequency, benchmark, status, notes)
+         VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9)`,
+        [modelName, riskLevel, objective, allocation, minimum, rebalance, benchmark, status, `${modelName} proposal template and model portfolio library entry.`]
+      );
+    }
 
     await client.query('COMMIT');
     console.log('✅ Database seeded successfully!');
