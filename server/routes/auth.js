@@ -15,34 +15,41 @@ router.post('/login', async (req, res) => {
     if (!valid) return res.status(401).json({ error: 'Invalid credentials' });
 
     const token = jwt.sign(
-      { id: user.id, email: user.email, role: user.role },
+      { id: String(user.id), email: user.email, role: user.role || 'advisor',
+        tenantId: process.env.GOVERNANCE_TENANT_ID, subjectIds: [`account:${user.id}`] },
       process.env.JWT_SECRET,
-      { expiresIn: '24h' }
+      { algorithm: 'HS256', expiresIn: '8h' }
     );
     res.json({ token, user: { id: user.id, email: user.email, name: user.name, role: user.role } });
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    console.error('Login failed:', err.message);
+    res.status(500).json({ error: 'internal server error' });
   }
 });
 
 router.post('/register', async (req, res) => {
   try {
-    const { name, email, password, role } = req.body;
-    const hash = await bcrypt.hash(password, 10);
+    const { name, email, password } = req.body;
+    if (!name || !email || typeof password !== 'string' || password.length < 12) {
+      return res.status(400).json({ error: 'name, email, and a password of at least 12 characters are required' });
+    }
+    const hash = await bcrypt.hash(password, 12);
     const result = await pool.query(
       'INSERT INTO users (name, email, password_hash, role) VALUES ($1, $2, $3, $4) RETURNING id, name, email, role',
-      [name, email, hash, role || 'advisor']
+      [name, email, hash, 'advisor']
     );
     const user = result.rows[0];
     const token = jwt.sign(
-      { id: user.id, email: user.email, role: user.role },
+      { id: String(user.id), email: user.email, role: user.role,
+        tenantId: process.env.GOVERNANCE_TENANT_ID, subjectIds: [`account:${user.id}`] },
       process.env.JWT_SECRET,
-      { expiresIn: '24h' }
+      { algorithm: 'HS256', expiresIn: '8h' }
     );
     res.status(201).json({ token, user });
   } catch (err) {
     if (err.code === '23505') return res.status(400).json({ error: 'Email already exists' });
-    res.status(500).json({ error: err.message });
+    console.error('Registration failed:', err.message);
+    res.status(500).json({ error: 'internal server error' });
   }
 });
 

@@ -1,89 +1,13 @@
-#!/bin/bash
+#!/usr/bin/env bash
+set -euo pipefail
 
-echo "=============================================="
-echo "  AI Wealth Management Robo-Advisor"
-echo "  Starting Application..."
-echo "=============================================="
-
-# Colors
-GREEN='\033[0;32m'
-YELLOW='\033[1;33m'
-RED='\033[0;31m'
-BLUE='\033[0;34m'
-NC='\033[0m'
-
-# Kill any processes on our ports
-echo -e "\n${YELLOW}Cleaning up ports...${NC}"
-for PORT in 4000 3000; do
-  PID=$(lsof -ti:$PORT 2>/dev/null)
-  if [ ! -z "$PID" ]; then
-    echo -e "  Killing process on port $PORT (PID: $PID)"
-    kill -9 $PID 2>/dev/null
-  fi
-done
-sleep 1
-
-# Check PostgreSQL
-echo -e "\n${YELLOW}Checking PostgreSQL...${NC}"
-if ! pg_isready -q 2>/dev/null; then
-  echo -e "  ${YELLOW}Starting PostgreSQL...${NC}"
-  brew services start postgresql@14 2>/dev/null || brew services start postgresql 2>/dev/null
-  sleep 2
-fi
-
-if pg_isready -q 2>/dev/null; then
-  echo -e "  ${GREEN}PostgreSQL is running${NC}"
-else
-  echo -e "  ${RED}PostgreSQL is not running. Please start it manually.${NC}"
-  exit 1
-fi
-
-# Load environment variables
-if [ -f .env ]; then
-  export $(grep -v '^#' .env | xargs)
-fi
-
-DB_NAME=${DB_NAME:-wealth_advisor}
-DB_USER=${DB_USER:-$(whoami)}
-
-# Create database if not exists
-echo -e "\n${YELLOW}Setting up database...${NC}"
-psql -U "$DB_USER" -d postgres -tc "SELECT 1 FROM pg_database WHERE datname = '$DB_NAME'" 2>/dev/null | grep -q 1 || \
-  createdb -U "$DB_USER" "$DB_NAME" 2>/dev/null
-
-if psql -U "$DB_USER" -d postgres -tc "SELECT 1 FROM pg_database WHERE datname = '$DB_NAME'" 2>/dev/null | grep -q 1; then
-  echo -e "  ${GREEN}Database '$DB_NAME' ready${NC}"
-else
-  echo -e "  ${RED}Failed to create database. Check PostgreSQL user permissions.${NC}"
-fi
-
-# Install dependencies
-echo -e "\n${YELLOW}Installing dependencies...${NC}"
-npm install --silent 2>/dev/null
-echo -e "  ${GREEN}Server dependencies installed${NC}"
-
-cd client
-npm install --silent 2>/dev/null
-echo -e "  ${GREEN}Client dependencies installed${NC}"
-cd ..
-
-# Seed database
-echo -e "\n${YELLOW}Seeding database...${NC}"
-node server/seeds/seed.js
-if [ $? -eq 0 ]; then
-  echo -e "  ${GREEN}Database seeded successfully${NC}"
-else
-  echo -e "  ${RED}Seed failed. Check database connection.${NC}"
-fi
-
-# Start application with hot reload
-echo -e "\n${GREEN}=============================================="
-echo -e "  Starting Application with Hot Reload"
-echo -e "==============================================${NC}"
-echo -e "  ${BLUE}Backend:${NC}  http://localhost:4000"
-echo -e "  ${BLUE}Frontend:${NC} http://localhost:3000"
-echo -e "  ${BLUE}Login:${NC}    admin@wealthadvisor.com / password123"
-echo -e "  ${YELLOW}Press Ctrl+C to stop${NC}\n"
-
-# Start both server and client with hot reload
-npm run dev
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"; ENV_FILE="$ROOT_DIR/.env"; API_DIR="$ROOT_DIR"; UI_DIR="$ROOT_DIR/client"; MIGRATION_DIR="$ROOT_DIR/server/migrations"
+read_env() { awk -F= -v key="$1" '$0 !~ /^[[:space:]]*#/ && $1 == key { value=substr($0,index($0,"=")+1); gsub(/^[[:space:]]+|[[:space:]]+$/, "", value); gsub(/^["\047]|["\047]$/, "", value); print value; exit }' "$ENV_FILE"; }
+load_env_key() { local key="$1" parsed; [ -n "${!key-}" ] && return 0; [ -f "$ENV_FILE" ] || return 0; parsed="$(read_env "$key")"; [ -z "$parsed" ] || export "$key=$parsed"; }
+for key in DATABASE_URL JWT_SECRET GOVERNANCE_TENANT_ID ENABLE_GENERATED_FEATURES ALLOW_SCHEMA_MIGRATION BACKEND_PORT FRONTEND_PORT; do load_env_key "$key"; done
+BACKEND_PORT="${BACKEND_PORT:-4000}"; FRONTEND_PORT="${FRONTEND_PORT:-3000}"
+fail() { printf 'error: %s\n' "$*" >&2; exit 1; }
+check_config() { local jwt_secret="${JWT_SECRET:-}"; command -v node >/dev/null || fail "node is required"; command -v npm >/dev/null || fail "npm is required"; [ -n "${DATABASE_URL:-}" ] || fail "DATABASE_URL is required"; [ -n "${GOVERNANCE_TENANT_ID:-}" ] || fail "GOVERNANCE_TENANT_ID is required"; [ "${#jwt_secret}" -ge 32 ] || fail "JWT_SECRET must contain at least 32 characters"; case "$DATABASE_URL" in *example*|*changeme*|*password@*) fail "DATABASE_URL contains a placeholder" ;; esac; printf 'configuration valid for tenant %s\n' "$GOVERNANCE_TENANT_ID"; }
+migrate() { check_config; [ "${ALLOW_SCHEMA_MIGRATION:-0}" = "1" ] || fail "set ALLOW_SCHEMA_MIGRATION=1 for the explicit migration command"; command -v psql >/dev/null || fail "psql is required for migrations"; local found=0; for migration in "$MIGRATION_DIR"/*.sql; do [ -f "$migration" ] || continue; found=1; psql "$DATABASE_URL" -v ON_ERROR_STOP=1 -f "$migration"; done; [ "$found" = "1" ] || fail "no migrations found"; }
+start_services() { check_config; [ -d "$API_DIR/node_modules" ] || fail "backend dependencies are missing; install them explicitly"; [ -d "$UI_DIR/node_modules" ] || fail "frontend dependencies are missing; install them explicitly"; (cd "$API_DIR" && PORT="$BACKEND_PORT" node server/index.js) & api_pid=$!; (cd "$UI_DIR" && npm run dev -- --host 127.0.0.1 --port "$FRONTEND_PORT") & ui_pid=$!; trap 'kill "$api_pid" "$ui_pid" 2>/dev/null || true; wait "$api_pid" "$ui_pid" 2>/dev/null || true' INT TERM EXIT; wait "$api_pid" "$ui_pid"; }
+case "${1:-check}" in check) check_config ;; migrate) migrate ;; start) start_services ;; *) fail "usage: $0 {check|migrate|start}" ;; esac

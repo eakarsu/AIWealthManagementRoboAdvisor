@@ -2,13 +2,11 @@ require('dotenv').config();
 const { Pool } = require('pg');
 const bcrypt = require('bcryptjs');
 
-const pool = new Pool({
-  host: process.env.DB_HOST || 'localhost',
-  port: process.env.DB_PORT || 5432,
-  database: process.env.DB_NAME || 'wealth_advisor',
-  user: process.env.DB_USER || 'postgres',
-  password: process.env.DB_PASSWORD || 'postgres',
-});
+if (process.env.ALLOW_DESTRUCTIVE_SEED !== 'true') throw new Error('ALLOW_DESTRUCTIVE_SEED=true is required');
+if (!process.env.DATABASE_URL || !process.env.SEED_ADMIN_PASSWORD) {
+  throw new Error('DATABASE_URL and SEED_ADMIN_PASSWORD are required');
+}
+const pool = new Pool({ connectionString: process.env.DATABASE_URL });
 
 async function seed() {
   const client = await pool.connect();
@@ -378,13 +376,13 @@ async function seed() {
     `);
 
     // Seed Users
-    const passwordHash = await bcrypt.hash('password123', 10);
+    const passwordHash = await bcrypt.hash(process.env.SEED_ADMIN_PASSWORD, 12);
     await client.query(`
       INSERT INTO users (name, email, password_hash, role) VALUES
-      ('Admin User', 'admin@wealthadvisor.com', '${passwordHash}', 'admin'),
-      ('Sarah Johnson', 'sarah@wealthadvisor.com', '${passwordHash}', 'advisor'),
-      ('Michael Chen', 'michael@wealthadvisor.com', '${passwordHash}', 'advisor');
-    `);
+      ('Admin User', 'admin@wealthadvisor.com', $1, 'admin'),
+      ('Sarah Johnson', 'sarah@wealthadvisor.com', $1, 'advisor'),
+      ('Michael Chen', 'michael@wealthadvisor.com', $1, 'advisor');
+    `, [passwordHash]);
 
     // Seed Clients (15+)
     await client.query(`
@@ -877,7 +875,7 @@ async function seed() {
 
     await client.query('COMMIT');
     console.log('✅ Database seeded successfully!');
-    console.log('📧 Login: admin@wealthadvisor.com / password123');
+    console.log('Seed users created; credentials were supplied through the environment.');
   } catch (err) {
     await client.query('ROLLBACK');
     console.error('❌ Seed failed:', err.message);

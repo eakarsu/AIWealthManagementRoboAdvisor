@@ -10,11 +10,6 @@ export default function Login() {
   const { login } = useAuth();
   const navigate = useNavigate();
 
-  const handleAutoFill = () => {
-    setEmail('admin@wealthadvisor.com');
-    setPassword('password123');
-  };
-
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
@@ -37,10 +32,6 @@ export default function Login() {
         </div>
 
         {error && <div className="login-error">{error}</div>}
-
-        <button className="auto-fill-btn" onClick={handleAutoFill}>
-          Click to auto-fill demo credentials
-        </button>
 
         <form onSubmit={handleSubmit}>
           <div className="form-group">
