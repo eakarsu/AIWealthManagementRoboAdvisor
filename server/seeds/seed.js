@@ -379,10 +379,10 @@ async function seed() {
     const passwordHash = await bcrypt.hash(process.env.SEED_ADMIN_PASSWORD, 12);
     await client.query(`
       INSERT INTO users (name, email, password_hash, role) VALUES
-      ('Admin User', 'admin@wealthadvisor.com', $1, 'admin'),
+      ('Admin User', $2, $1, 'admin'),
       ('Sarah Johnson', 'sarah@wealthadvisor.com', $1, 'advisor'),
       ('Michael Chen', 'michael@wealthadvisor.com', $1, 'advisor');
-    `, [passwordHash]);
+    `, [passwordHash, process.env.SEED_ADMIN_EMAIL || 'admin@wealthadvisor.com']);
 
     // Seed Clients (15+)
     await client.query(`

@@ -46,9 +46,9 @@ const operationalRoutes = [
   ['/api/model-portfolios', './routes/modelPortfolios'], ['/api/client-messages', './routes/clientMessages']
 ];
 operationalRoutes.forEach(([mount, modulePath]) => app.use(mount, require(modulePath)));
+app.use('/api/ai', require('./routes/ai'));
 
 if (generatedRoutesEnabled) {
-  app.use('/api/ai', require('./routes/ai'));
   app.use('/api/custom', require('./routes/customFeatures'));
 }
 
