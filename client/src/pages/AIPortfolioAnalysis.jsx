@@ -22,7 +22,7 @@ export default function AIPortfolioAnalysis() {
   }, []);
 
   const loadSample = (sample, idx) => {
-    const pid = portfolios[idx % portfolios.length]?.id || '';
+    const pid = portfolios.some(row=>String(row.id)===String(form.portfolio_id)) ? form.portfolio_id : portfolios[idx % portfolios.length]?.id || '';
     setForm({ portfolio_id: String(pid) });
     setResult(null);
   };

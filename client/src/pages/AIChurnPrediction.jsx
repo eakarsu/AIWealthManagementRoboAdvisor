@@ -13,6 +13,13 @@ export default function AIChurnPrediction() {
     api.getClients().then(setClients).catch(() => {});
   }, []);
 
+  const loadSample = (index) => {
+    const selected = clients.some(client => String(client.id) === form.client_id)
+      ? form.client_id : clients[index % clients.length]?.id;
+    setForm({ client_id: selected ? String(selected) : '' });
+    setResult(null);
+  };
+
   const handleSubmit = async () => {
     setLoading(true); setError(''); setResult(null);
     try {
@@ -35,6 +42,14 @@ export default function AIChurnPrediction() {
         </div>
       </div>
 
+      <div className="sample-buttons">
+        <div className="sample-buttons-label">Client examples — select a real client to continue</div>
+        {['Review first client', 'Review another client', 'Review third client'].map((label, index) => (
+          <button type="button" key={label} className="btn-sample" onClick={() => loadSample(index)}>{label}</button>
+        ))}
+        {!clients.length && <p>No clients are available. Add or select a real client before running a prediction.</p>}
+      </div>
+
       <div className="card">
         <div className="card-header"><h3>Select Client</h3></div>
         <div className="card-body">
@@ -45,7 +60,7 @@ export default function AIChurnPrediction() {
               value={form.client_id}
               onChange={e => setForm({ ...form, client_id: e.target.value })}
             >
-              <option value="">-- Select a client (or leave for sample) --</option>
+              <option value="">-- Select a client --</option>
               {clients.map(c => (
                 <option key={c.id} value={c.id}>
                   {c.name} — {c.risk_tolerance || 'unknown'} risk — ${Number(c.net_worth || 0).toLocaleString()}
@@ -58,7 +73,7 @@ export default function AIChurnPrediction() {
               Tenure: <strong>{selectedClient.tenure_years || 'n/a'}</strong> | AUM: <strong>${Number(selectedClient.net_worth || 0).toLocaleString()}</strong>
             </div>
           )}
-          <button className="btn btn-ai" onClick={handleSubmit} disabled={loading}>
+          <button className="btn btn-ai" onClick={handleSubmit} disabled={loading || !form.client_id}>
             {loading ? 'Analyzing...' : 'Run Churn Prediction'}
           </button>
         </div>

@@ -17,9 +17,17 @@ async function request(method, path, body) {
   return data;
 }
 
+// Record endpoints normally return arrays; some deployments wrap lists with pagination.
+async function requestList(path) {
+  const payload = await request('GET', path);
+  const rows = Array.isArray(payload) ? payload : payload?.data;
+  if (!Array.isArray(rows)) throw new Error(`Invalid list response from ${path}`);
+  return rows;
+}
+
 function crud(path) {
   return {
-    list: () => request('GET', path),
+    list: () => requestList(path),
     get: (id) => request('GET', `${path}/${id}`),
     create: (body) => request('POST', path, body),
     update: (id, body) => request('PUT', `${path}/${id}`, body),
@@ -33,70 +41,70 @@ export const api = {
   register: (body) => request('POST', '/auth/register', body),
 
   // Clients
-  getClients: () => request('GET', '/clients'),
+  getClients: () => requestList('/clients'),
   getClient: (id) => request('GET', `/clients/${id}`),
   createClient: (body) => request('POST', '/clients', body),
   updateClient: (id, body) => request('PUT', `/clients/${id}`, body),
   deleteClient: (id) => request('DELETE', `/clients/${id}`),
 
   // Portfolios
-  getPortfolios: () => request('GET', '/portfolios'),
+  getPortfolios: () => requestList('/portfolios'),
   getPortfolio: (id) => request('GET', `/portfolios/${id}`),
   createPortfolio: (body) => request('POST', '/portfolios', body),
   updatePortfolio: (id, body) => request('PUT', `/portfolios/${id}`, body),
   deletePortfolio: (id) => request('DELETE', `/portfolios/${id}`),
 
   // Transactions
-  getTransactions: () => request('GET', '/transactions'),
+  getTransactions: () => requestList('/transactions'),
   getTransaction: (id) => request('GET', `/transactions/${id}`),
   createTransaction: (body) => request('POST', '/transactions', body),
   updateTransaction: (id, body) => request('PUT', `/transactions/${id}`, body),
   deleteTransaction: (id) => request('DELETE', `/transactions/${id}`),
 
   // Assets
-  getAssets: () => request('GET', '/assets'),
+  getAssets: () => requestList('/assets'),
   getAsset: (id) => request('GET', `/assets/${id}`),
   createAsset: (body) => request('POST', '/assets', body),
   updateAsset: (id, body) => request('PUT', `/assets/${id}`, body),
   deleteAsset: (id) => request('DELETE', `/assets/${id}`),
 
   // Watchlist
-  getWatchlist: () => request('GET', '/watchlist'),
+  getWatchlist: () => requestList('/watchlist'),
   getWatchlistItem: (id) => request('GET', `/watchlist/${id}`),
   createWatchlistItem: (body) => request('POST', '/watchlist', body),
   updateWatchlistItem: (id, body) => request('PUT', `/watchlist/${id}`, body),
   deleteWatchlistItem: (id) => request('DELETE', `/watchlist/${id}`),
 
   // Goals
-  getGoals: () => request('GET', '/goals'),
+  getGoals: () => requestList('/goals'),
   getGoal: (id) => request('GET', `/goals/${id}`),
   createGoal: (body) => request('POST', '/goals', body),
   updateGoal: (id, body) => request('PUT', `/goals/${id}`, body),
   deleteGoal: (id) => request('DELETE', `/goals/${id}`),
 
   // Alerts
-  getAlerts: () => request('GET', '/alerts'),
+  getAlerts: () => requestList('/alerts'),
   getAlert: (id) => request('GET', `/alerts/${id}`),
   createAlert: (body) => request('POST', '/alerts', body),
   updateAlert: (id, body) => request('PUT', `/alerts/${id}`, body),
   deleteAlert: (id) => request('DELETE', `/alerts/${id}`),
 
   // Fees
-  getFees: () => request('GET', '/fees'),
+  getFees: () => requestList('/fees'),
   getFee: (id) => request('GET', `/fees/${id}`),
   createFee: (body) => request('POST', '/fees', body),
   updateFee: (id, body) => request('PUT', `/fees/${id}`, body),
   deleteFee: (id) => request('DELETE', `/fees/${id}`),
 
   // Documents
-  getDocuments: () => request('GET', '/documents'),
+  getDocuments: () => requestList('/documents'),
   getDocument: (id) => request('GET', `/documents/${id}`),
   createDocument: (body) => request('POST', '/documents', body),
   updateDocument: (id, body) => request('PUT', `/documents/${id}`, body),
   deleteDocument: (id) => request('DELETE', `/documents/${id}`),
 
   // Performance
-  getPerformance: () => request('GET', '/performance'),
+  getPerformance: () => requestList('/performance'),
   getPerformanceRecord: (id) => request('GET', `/performance/${id}`),
   createPerformance: (body) => request('POST', '/performance', body),
   updatePerformance: (id, body) => request('PUT', `/performance/${id}`, body),

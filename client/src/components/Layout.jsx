@@ -1,3 +1,4 @@
+import AIReportLibrary from "./AIReportLibrary";
 import { Outlet, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import AISidebar from './AISidebar';
@@ -102,7 +103,7 @@ export default function Layout() {
             ↪
           </button>
         </div>
-      </aside>
+      <AIReportLibrary /></aside>
 
       <main className="main-content">
         <Outlet />

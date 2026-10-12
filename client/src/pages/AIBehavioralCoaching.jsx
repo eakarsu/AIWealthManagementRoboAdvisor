@@ -20,7 +20,9 @@ export default function AIBehavioralCoaching() {
   }, []);
 
   const loadSample = (sample) => {
-    setForm(f => ({ ...f, ...sample.data }));
+    const clientId = clients.some(client => String(client.id) === form.client_id)
+      ? form.client_id : clients[0]?.id;
+    setForm(f => ({ ...f, ...sample.data, client_id: clientId ? String(clientId) : '' }));
     setResult(null);
   };
 
@@ -55,6 +57,8 @@ export default function AIBehavioralCoaching() {
           </button>
         ))}
       </div>
+
+      {!clients.length && <p>Select a real client if you want transaction context; no client is currently available.</p>}
 
       <div className="card">
         <div className="card-header"><h3>Configure Coaching</h3></div>

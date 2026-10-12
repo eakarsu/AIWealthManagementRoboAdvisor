@@ -27,7 +27,7 @@ export default function AIRiskAssessment() {
   }, []);
 
   const loadSample = (sample, idx) => {
-    const cid = clients[idx % clients.length]?.id || '';
+    const cid = clients.some(row=>String(row.id)===String(form.client_id)) ? form.client_id : clients[idx % clients.length]?.id || '';
     setForm({ ...sample.data, client_id: String(cid) });
     setResult(null);
   };

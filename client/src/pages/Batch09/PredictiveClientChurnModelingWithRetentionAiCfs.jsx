@@ -1,5 +1,7 @@
 // // === Batch 09 Gaps & Frontend Mounts ===
 import React, { useState } from 'react';
+import AIReport from '../../components/AIReport';
+import PromptPresets from '../../components/PromptPresets';
 
 export default function PredictiveClientChurnModelingWithRetentionAiPage() {
   const [input, setInput] = useState('');
@@ -27,6 +29,7 @@ export default function PredictiveClientChurnModelingWithRetentionAiPage() {
     <div style={{ padding: 24, maxWidth: 900, margin: '0 auto' }}>
       <h1 style={{ fontSize: 24, fontWeight: 700, marginBottom: 8 }}>Predictive client churn modeling with retention AI</h1>
       <p style={{ color: '#666', marginBottom: 16 }}>Generated gap feature for AIWealthManagementRoboAdvisor.</p>
+      <PromptPresets title={'Predictive client churn modeling with retention AI'} onFill={setInput} />
       <textarea
         value={input}
         onChange={e => setInput(e.target.value)}
@@ -42,11 +45,7 @@ export default function PredictiveClientChurnModelingWithRetentionAiPage() {
         {loading ? 'Running...' : 'Run AI'}
       </button>
       {error && <div style={{ color: 'red', marginTop: 12 }}>{error}</div>}
-      {result && (
-        <pre style={{ marginTop: 16, padding: 12, background: '#f4f4f4', borderRadius: 6, overflow: 'auto', maxHeight: 500 }}>
-{JSON.stringify(result, null, 2)}
-        </pre>
-      )}
+      <AIReport response={result} title={'Predictive client churn modeling with retention AI'} />
     </div>
   );
 }

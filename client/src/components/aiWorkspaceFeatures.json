@@ -1,0 +1,51 @@
+[
+  {
+    "name": "BeneficiaryAndTrustAccountManagementPage",
+    "id": "gap-nonai-aiwealthmanagementroboadvisor/beneficiary-and-trust-account-management",
+    "title": "Beneficiary and trust-account management",
+    "description": "Prepare a professional advisory report for beneficiary and trust-account management using the brief and evidence you provide. Review the findings, assumptions, and action plan before applying changes.",
+    "samples": []
+  },
+  {
+    "name": "ClientMeetingNotesCrmIntegrationPage",
+    "id": "gap-nonai-aiwealthmanagementroboadvisor/client-meeting-notes-crm-integration",
+    "title": "Client meeting notes / CRM integration",
+    "description": "Prepare a professional advisory report for client meeting notes / crm integration using the brief and evidence you provide. Review the findings, assumptions, and action plan before applying changes.",
+    "samples": []
+  },
+  {
+    "name": "ComplianceAuditTrailAndReviewerQueuePage",
+    "id": "gap-nonai-aiwealthmanagementroboadvisor/compliance-audit-trail-and-reviewer-queue",
+    "title": "Compliance audit trail and reviewer queue",
+    "description": "Prepare a professional advisory report for compliance audit trail and reviewer queue using the brief and evidence you provide. Review the findings, assumptions, and action plan before applying changes.",
+    "samples": []
+  },
+  {
+    "name": "ExternalBrokercustodianAccountAggregationPage",
+    "id": "gap-nonai-aiwealthmanagementroboadvisor/external-brokercustodian-account-aggregation",
+    "title": "External broker/custodian account aggregation",
+    "description": "Prepare a professional advisory report for external broker/custodian account aggregation using the brief and evidence you provide. Review the findings, assumptions, and action plan before applying changes.",
+    "samples": []
+  },
+  {
+    "name": "GranularNotificationPreferenceCenterPage",
+    "id": "gap-nonai-aiwealthmanagementroboadvisor/granular-notification-preference-center",
+    "title": "Granular notification preference center",
+    "description": "Prepare a professional advisory report for granular notification preference center using the brief and evidence you provide. Review the findings, assumptions, and action plan before applying changes.",
+    "samples": []
+  },
+  {
+    "name": "RegulatoryReportingFormAdvRegBiPage",
+    "id": "gap-nonai-aiwealthmanagementroboadvisor/regulatory-reporting-form-adv-reg-bi",
+    "title": "Regulatory reporting (Form ADV, Reg BI)",
+    "description": "Prepare a professional advisory report for regulatory reporting (form adv, reg bi) using the brief and evidence you provide. Review the findings, assumptions, and action plan before applying changes.",
+    "samples": []
+  },
+  {
+    "name": "TaxFormGeneration1099K1AndDownloadsPage",
+    "id": "gap-nonai-aiwealthmanagementroboadvisor/tax-form-generation-1099-k-1-and-downloads",
+    "title": "Tax form generation (1099, K-1) and downloads",
+    "description": "Prepare a professional advisory report for tax form generation (1099, k-1) and downloads using the brief and evidence you provide. Review the findings, assumptions, and action plan before applying changes.",
+    "samples": []
+  }
+]
