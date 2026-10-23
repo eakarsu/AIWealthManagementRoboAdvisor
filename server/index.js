@@ -31,6 +31,7 @@ app.get('/api/health', (req, res) => {
 
 app.use('/api', auth);
 app.use('/api/governance', governanceRouter);
+app.use('/api/feature-pack', require('./routes/featurePack'));
 
 const operationalRoutes = [
   ['/api/clients', './routes/clients'], ['/api/portfolios', './routes/portfolios'],

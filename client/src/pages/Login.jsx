@@ -10,15 +10,30 @@ export default function Login() {
   const { login } = useAuth();
   const navigate = useNavigate();
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+  const submitLogin = async (loginEmail, loginPassword) => {
     setError('');
     try {
-      const data = await api.login({ email, password });
+      const data = await api.login({ email: loginEmail, password: loginPassword });
       login(data.token, data.user);
       navigate('/');
     } catch (err) {
       setError(err.message);
+    }
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    await submitLogin(email, password);
+  };
+
+  const handleDemoLogin = async () => {
+    const demoEmail = import.meta.env.VITE_DEMO_EMAIL || '';
+    const demoPassword = import.meta.env.VITE_DEMO_PASSWORD || '';
+    setEmail(demoEmail);
+    setPassword(demoPassword);
+    setError('');
+    if (demoEmail && demoPassword) {
+      await submitLogin(demoEmail, demoPassword);
     }
   };
 
@@ -58,7 +73,7 @@ export default function Login() {
           </div>
           <button
             type="button"
-            onClick={() => { setEmail(import.meta.env.VITE_DEMO_EMAIL || ''); setPassword(import.meta.env.VITE_DEMO_PASSWORD || ''); setError(''); }}
+            onClick={handleDemoLogin}
             disabled={!import.meta.env.VITE_DEMO_EMAIL || !import.meta.env.VITE_DEMO_PASSWORD}
             aria-label="Fill demo credentials"
             style={{ width: '100%', marginBottom: '12px', padding: '10px 14px', borderRadius: '8px', border: '1px solid currentColor', background: 'transparent', cursor: 'pointer' }}
